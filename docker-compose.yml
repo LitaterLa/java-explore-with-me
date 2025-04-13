@@ -14,6 +14,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stats_db
       - SPRING_DATASOURCE_USERNAME=ewm
       - SPRING_DATASOURCE_PASSWORD=ewm
+      - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
 
   stats-db:
     image: postgres:16.1
@@ -30,8 +31,8 @@ services:
       timeout: 5s
       retries: 5
 
-  ewm-main-service:
-    build: ./ewm-main  # Путь к основному сервису
+  ewm-service:
+    build: ./ewm-main
     image: ewm-main-service
     container_name: ewm-main-app
     ports:
@@ -44,6 +45,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=ewm
       - SPRING_DATASOURCE_PASSWORD=ewm
       - STATS_SERVER_URL=http://ewm-stats:9090
+      - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
 
   ewm-db:
     image: postgres:16.1
