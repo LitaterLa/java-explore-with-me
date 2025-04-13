@@ -29,7 +29,7 @@ services:
       timeout: 5s
       retries: 5
 
-  ewm-service:
+  ewm-main:
     build: ewm-main
     image: ewm-main-service
     container_name: ewm-main-app
