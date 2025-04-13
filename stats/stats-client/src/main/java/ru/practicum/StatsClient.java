@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class StatsClient {
                 .retrieve()
                 .onStatus(code -> code == HttpStatus.BAD_REQUEST,
                         (request, response) -> {
-                            String error = new String(response.getBody().readAllBytes());
+                            String error = new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8);
                             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ошибка в данных: " + error);
                         })
                 .onStatus(
@@ -51,7 +52,7 @@ public class StatsClient {
                 .retrieve()
                 .onStatus(code -> code == HttpStatus.BAD_REQUEST,
                         (request, response) -> {
-                            String error = new String(response.getBody().readAllBytes());
+                            String error = new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8);
                             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ошибка в данных: " + error);
                         })
                 .body(new ParameterizedTypeReference<>() {
