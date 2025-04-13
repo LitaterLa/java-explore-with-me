@@ -52,10 +52,6 @@ public class StatsRepositoryImpl implements StatsRepository {
                 .addValue("end", end);
 
         if (uris != null && !uris.isEmpty()) {
-//            StringBuilder string = new StringBuilder("AND uri IN ('");
-//            string.append(String.join("', '", uris)).append("') ");
-//            query += string.toString();
-
             query += " AND s.uri IN (:uris)";
             params.addValue("uris", uris);
 
