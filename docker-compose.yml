@@ -1,19 +1,19 @@
+version: '3.8'
+
 services:
   stats-server:
-    build: stats-service/server
+    build: ./stats/stats-server
     image: ewm-stats-service
     container_name: ewm-stats
     ports:
       - "9090:9090"
     depends_on:
-      - stats-db
-      - ewm-main
+      stats-db:
+        condition: service_healthy
     environment:
-      - EWM_SERVER_URL=http://ewm-main:8080
       - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stats_db
       - SPRING_DATASOURCE_USERNAME=ewm
       - SPRING_DATASOURCE_PASSWORD=ewm
-
 
   stats-db:
     image: postgres:16.1
@@ -30,18 +30,20 @@ services:
       timeout: 5s
       retries: 5
 
-  ewm-main:
-    build: ewm-main
+  ewm-main-service:
+    build: ./ewm-main  # Путь к основному сервису
     image: ewm-main-service
     container_name: ewm-main-app
     ports:
       - "8080:8080"
     depends_on:
-      - stats-db
+      ewm-db:
+        condition: service_healthy
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewm-db
       - SPRING_DATASOURCE_USERNAME=ewm
       - SPRING_DATASOURCE_PASSWORD=ewm
+      - STATS_SERVER_URL=http://ewm-stats:9090
 
   ewm-db:
     image: postgres:16.1
