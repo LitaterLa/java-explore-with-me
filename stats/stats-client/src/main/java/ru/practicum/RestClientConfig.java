@@ -18,4 +18,9 @@ public class RestClientConfig {
                 .baseUrl(statsServiceUrl)
                 .build();
     }
+
+    @Bean
+    public StatsClient statsClient(RestClient restClient) {
+        return new StatsClient(restClient);
+    }
 }

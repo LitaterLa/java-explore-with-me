@@ -31,5 +31,4 @@ public class EndpointHit {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @Builder.Default
     LocalDateTime created = LocalDateTime.now();
-
 }
