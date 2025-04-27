@@ -101,8 +101,8 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public EventDto adminUpdateEvent(Integer eventId, UpdateEventAdminDto dto) {
 
-        Event event = repository.findById(eventId).
-                orElseThrow(() -> new NotFoundException("Событие не найдено"));
+        Event event = repository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Событие не найдено"));
 
         if (dto.getEventDate() != null && dto.getStateAction() == StateAction.PUBLISH_EVENT &&
                 dto.getEventDate().isBefore(LocalDateTime.now().plusHours(1))) {
@@ -178,8 +178,8 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public EventDto userUpdateEvent(Integer userId, Integer eventId, UpdateEventUserRequest dto) {
         validateUser(userId);
-        Event event = repository.findById(eventId).
-                orElseThrow(() -> new NotFoundException("Событие не найдено"));
+        Event event = repository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Событие не найдено"));
         if (event.getInitiator().getId() != userId) {
             throw new IllegalAccessException("Ошибка доступа к событию: не инициатор");
         }
