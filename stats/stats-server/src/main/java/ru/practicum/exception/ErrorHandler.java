@@ -8,18 +8,25 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpServerErrorException;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 @RestControllerAdvice
 public class ErrorHandler {
-    private static final Logger log = LoggerFactory.getLogger(ExceptionHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(ErrorHandler.class);
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleInternalServerException(final HttpServerErrorException.InternalServerError e) {
         log.warn("Непредвиденная ошибка: {}", e.getMessage());
-        return new ErrorResponse("Сервис статистики временно недоступен", e.getMessage());
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        String stackTrace = sw.toString();
+        return new ErrorResponse("Сервис статистики временно недоступен", e.getMessage(), stackTrace);
     }
 
 
-    private record ErrorResponse(String error, String description) {
+    private record ErrorResponse(String error, String description, String stackTrace) {
     }
 }

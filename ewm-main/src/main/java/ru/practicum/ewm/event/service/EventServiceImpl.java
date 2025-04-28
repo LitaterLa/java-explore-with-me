@@ -8,7 +8,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import ru.practicum.EndpointHit;
 import ru.practicum.StatsClient;
 import ru.practicum.ViewStats;
 import ru.practicum.ewm.event.dto.EventDto;
@@ -134,25 +133,18 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventDto getById(Integer id, String ip, String uri) {
+    public EventDto getById(Integer id) {
         Event event = repository.findById(id).orElseThrow(() -> new NotFoundException("Событие не найдено"));
 
         if (event.getPublishedOn() == null) {
             throw new NotFoundException("Событие id=" + id + " не найдено среди опубликованных событий");
         }
 
-        statsClient.sendHit(EndpointHit.builder()
-                .app("ewm-main-service")
-                .ip(ip)
-                .created(LocalDateTime.now())
-                .uri(uri)
-                .build());
-
         EventDto eventDto = mapper.toEventDto(event);
 
         List<ViewStats> stats = statsClient.getStats(event.getCreatedOn(),
                 LocalDateTime.now(),
-                List.of(uri),
+                List.of("/events/" + id),
                 true);
 
         int views = stats.isEmpty() ? 0 : stats.getFirst().getHits();
@@ -262,7 +254,6 @@ public class EventServiceImpl implements EventService {
         return result;
     }
 
-
     @Override
     public List<ParticipationRequestDto> getRequestsByUserIdAndEventId(Integer userId, Integer eventId) {
         User initiator = validateUser(userId);
@@ -280,7 +271,7 @@ public class EventServiceImpl implements EventService {
 
 
     @Override
-    public List<EventShortDto> getPublicInfo(PublicGetListParams params, String ip, String uri) {
+    public List<EventShortDto> getPublicInfo(PublicGetListParams params) {
         if (CollectionUtils.isEmpty(params.getCategories()) ||
                 params.getCategories().stream().allMatch(id -> id <= 0)) {
             throw new BadRequestException("Категории не указаны или содержат неверные ID");
@@ -295,13 +286,6 @@ public class EventServiceImpl implements EventService {
 
         List<Event> eventsResult = searchDynamicallyByUser(params, pageRequest);
 
-
-        statsClient.sendHit(EndpointHit.builder()
-                .app("ewm-main-service")
-                .ip(ip)
-                .created(LocalDateTime.now())
-                .uri(uri)
-                .build());
 
         List<String> uris = eventsResult.stream()
                 .map(e -> "/events/" + e.getId())
@@ -398,12 +382,7 @@ public class EventServiceImpl implements EventService {
             builder.and(event.eventDate.goe(LocalDateTime.now()));
         }
 
-        return queryFactory
-                .selectFrom(event)
-                .where(builder)
-                .offset(pageRequest.getOffset())
-                .limit(pageRequest.getPageSize())
-                .fetch();
+        return repository.findAll(builder, pageRequest).toList();
     }
 
 
@@ -415,4 +394,5 @@ public class EventServiceImpl implements EventService {
     private User validateUser(Integer userId) {
         return userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Пользователь не был найден"));
     }
+
 }

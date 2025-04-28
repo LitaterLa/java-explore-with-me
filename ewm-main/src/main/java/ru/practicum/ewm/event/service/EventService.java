@@ -22,11 +22,11 @@ public interface EventService {
 
     EventDto adminUpdateEvent(Integer eventId, UpdateEventAdminDto dto);
 
-    EventDto getById(Integer id, String remoteAddress, String uri);
+    EventDto getById(Integer id);
 
     List<EventDto> getAdminInfo(AdminGetListParams params);
 
-    List<EventShortDto> getPublicInfo(PublicGetListParams params, String remoteAddress, String uri);
+    List<EventShortDto> getPublicInfo(PublicGetListParams params);
 
     EventDto userUpdateEvent(Integer userId, Integer eventId, UpdateEventUserRequest dto);
 
