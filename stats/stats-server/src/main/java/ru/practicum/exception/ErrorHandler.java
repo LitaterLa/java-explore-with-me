@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.client.HttpServerErrorException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -16,8 +15,20 @@ public class ErrorHandler {
     private static final Logger log = LoggerFactory.getLogger(ErrorHandler.class);
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleBadRequestException(final StatsBadRequestException e) {
+        log.warn("Ошибка запроса: {}", e.getMessage());
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        String stackTrace = sw.toString();
+        return new ErrorResponse("Проверьте соотвествие передаваемых данных требуемым", e.getMessage(), stackTrace);
+    }
+
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleInternalServerException(final HttpServerErrorException.InternalServerError e) {
+    public ErrorResponse handleInternalServerException(final Exception e) {
         log.warn("Непредвиденная ошибка: {}", e.getMessage());
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
