@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.EndpointHit;
 import ru.practicum.ViewStats;
+import ru.practicum.exception.StatsBadRequestException;
 import ru.practicum.repository.StatsRepository;
 
 import java.time.LocalDateTime;
@@ -24,6 +25,9 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
+        if (start.isAfter(end)) {
+            throw new StatsBadRequestException("Дата начала диапазона позже даты окончания");
+        }
         return repository.getStats(start, end, uris, unique);
     }
 }
