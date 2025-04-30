@@ -40,12 +40,14 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CompilationDto findById(int id) {
         Compilation compilation = repository.findById(id).orElseThrow(() -> new NotFoundException("Не найдена подборка id=" + id));
         return mapper.toCompilationDto(compilation);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CompilationDto> findAll(Boolean pinned, int from, int size) {
         int page = from >= size ? from / size : 0;
         PageRequest pageRequest = PageRequest.of(page, size);

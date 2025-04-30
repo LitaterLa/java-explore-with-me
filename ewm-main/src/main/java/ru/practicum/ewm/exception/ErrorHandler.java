@@ -64,7 +64,7 @@ public class ErrorHandler {
         return sw.toString();
     }
 
-    private record ErrorResponse(String error, String description, String stackTrace) {
+    record ErrorResponse(String error, String description, String stackTrace) {
     }
 
 }
