@@ -3,6 +3,7 @@ package ru.practicum;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,6 +22,7 @@ import java.util.List;
 
 @RestController
 @Validated
+@Slf4j
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class StatsController {
@@ -29,6 +31,7 @@ public class StatsController {
     @PostMapping("/hit")
     @ResponseStatus(HttpStatus.CREATED)
     public EndpointHit saveHit(@RequestBody @Valid @NotNull EndpointHit hit) {
+        log.info("Вызов статистики, метод saveHit uri={}", hit.getUri());
         return service.saveHit(hit);
     }
 
@@ -38,6 +41,7 @@ public class StatsController {
                                     @RequestParam(required = false) List<String> uris,
                                     @RequestParam(defaultValue = "false") boolean unique
     ) {
+        log.info("Сервис статистики: вызов метода getStats");
         return service.getStats(start, end, uris, unique);
     }
 }
