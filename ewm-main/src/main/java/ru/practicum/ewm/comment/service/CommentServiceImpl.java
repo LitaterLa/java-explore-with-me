@@ -1,6 +1,7 @@
 package ru.practicum.ewm.comment.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,8 @@ public class CommentServiceImpl implements CommentService {
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
     private final CommentMapper mapper;
+    @Value("${comment.editable.duration.hours}")
+    private long editableDurationHours;
 
 
     @Override
@@ -52,8 +55,10 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public CommentDto updateComment(UpdateCommentDto dto, int commentId, int userId, int eventId) {
         Comment comment = getCommentOrThrow(commentId);
-        if (comment.getCreated().plusHours(3).isBefore(LocalDateTime.now())) {
-            throw new BadRequestException("С момента публикации комментария прошло более 3 часов, редактирование невозможно");
+        if (comment.getCreated().plusHours(editableDurationHours).isBefore(LocalDateTime.now())) {
+            throw new BadRequestException("С момента публикации комментария прошло более "
+                    + editableDurationHours + " часов, редактирование невозможно");
+
         }
         getUserOrThrow(userId);
         getEventOrThrow(eventId);
