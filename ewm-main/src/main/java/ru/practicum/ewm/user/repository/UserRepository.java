@@ -8,7 +8,6 @@ import ru.practicum.ewm.user.model.User;
 
 import java.util.List;
 
-//здесь мало операций, может использовать CrudRepository? для однообразия в этом модуле выбрада пока JpaRepository
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
 
